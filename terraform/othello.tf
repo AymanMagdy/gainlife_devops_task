@@ -1,15 +1,15 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
 
 resource "aws_key_pair" "othello-deployer" {
-  key_name   = "deployer-key"
-  public_key = file("~/.ssh/id_rsa.pub")
+  key_name   = var.key_name
+  public_key = file(var.public_key_path)
 }
 
 resource "aws_security_group" "othello_sg" {
   name        = "othello-sg"
-  description = "Allow HTTP and SSH"
+  description = "Allow HTTP and SSH 22 and 3000 protocols"
 
   ingress {
     from_port   = 22
@@ -34,16 +34,16 @@ resource "aws_security_group" "othello_sg" {
 }
 
 resource "aws_instance" "othello_app" {
-  ami           = "ami-0c55b159cbfafe1f0"
-  instance_type = "t2.micro"
-  key_name      = aws_key_pair.deployer.key_name
+  ami           = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
   security_groups = [aws_security_group.othello_sg.name]
 
   user_data = <<-EOF
               #!/bin/bash
               curl -sL https://rpm.nodesource.com/setup_18.x | bash -
               yum install -y nodejs git
-              git clone https://github.com/AymanMagdy/gainline_devops_task.git /home/ec2-user/app
+              git clone ${var.github_repo_url} /home/ec2-user/app
               cd /home/ec2-user/app/othello/othello_app
               npm run install
               npm run build

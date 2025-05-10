@@ -1,0 +1,5 @@
+region = "us-east-1"
+instance_type = "t3.micro"
+key_name = "othello_ec2_keypair"
+public_key_path = "~/.ssh/id_rsa.pub"
+github_repo_url = "https://github.com/AymanMagdy/gainlife_devops_task.git"
